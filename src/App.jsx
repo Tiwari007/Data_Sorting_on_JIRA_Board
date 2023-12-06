@@ -113,6 +113,7 @@ const App = () => {
   ]);
   const [modalIsOpen, setModalIsOpen] = useState(false);
   const [formData, setFormData] = useState({ name: '', phone: '', email: '', age: '' });
+  const [isEdit, setIsEdit] = useState(0);
   const [categorizedData, setCategorizedData] = useState({
     'Age 1-18': [],
     'Age 19-25': [],
@@ -121,94 +122,10 @@ const App = () => {
   });
   const [search, setSearch] = useState("")
 
-
-  // This Works Perfectly Fine
-  const openModal = () => {
-    setModalIsOpen(true);
-  };
-
-
-  // This Works Perfectly Fine
-  const closeModal = () => {
-    setModalIsOpen(false);
-  };
-
-
-  // This Works Perfectly Fine
-  const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
-
-
-  // This Works Perfectly Fine
-  const handleSubmit = () => {
-    const newData = [...data, formData];
-    localStorage.setItem('userData', JSON.stringify(newData));
-    setData(newData);
-    setModalIsOpen(false);
-  };
-
-
-  // This Works Perfectly Fine
-  const handleCancel = () => {
-    setFormData({ name: '', phone: '', email: '', age: '' });
-    setModalIsOpen(false);
-  }
-
-
-  // Partially Working (⚠)
-  const handleEdit = (id) => {
-    const editData = data.filter(single => single.id === id);
-    setFormData(editData);
-    setModalIsOpen(true);
-  };
-
-
-  // This Works Perfectly Fine
-  const handleDelete = (id) => {
-    const newData = data.filter(singleData => singleData.id !== id)
-    localStorage.setItem('userData', JSON.stringify(newData));
-    setData(newData);
-  };
-
   useEffect(() => {
     const storedData = JSON.parse(localStorage.getItem('userData')) || data;
     setData(storedData);
   }, []);
-
-
-  const GridItem = ({ title, data }) => {
-    return (
-      <div style={styles.gridItem}>
-        <h2>{title}</h2>
-        <div>
-          {
-            data && data?.map((user, index) => {
-              return (
-                <div key={index} style={styles.card}>
-                  <p style={styles.label}>Name: {user.name}</p>
-                  <p>Phone: {user.phone}</p>
-                  <p>Email: {user.email}</p>
-                  <p>Age: {user.age}</p>
-                  <div style={{ marginTop: '10px' }}>
-                    <button
-                      onClick={() => handleDelete(user.id)}
-                      style={{ ...styles.cardButton, ...styles.deleteButton }}
-                    >
-                      Delete
-                    </button>
-                    <button onClick={() => handleEdit(user.id)} style={styles.cardButton}>
-                      Edit
-                    </button>
-                  </div>
-                </div>
-              )
-            })
-          }
-        </div>
-      </div>
-    );
-  };
 
   useEffect(() => {
     console.log("data", data);
@@ -244,15 +161,135 @@ const App = () => {
 
   }, [data]);
 
-
-  // Partially Working 
+    // Partially Working 
   // When we type in search box it check the name that matches and store in the categorizedData.
   // That will show only that data we are looking for 
 
   // useEffect(() => {
-  //   const temp = data.map(single => single.name.includes(search))
+  //   const temp = data.filter(single => single?.name?.toLowerCase().includes(search?.toLowerCase()))
   //   setCategorizedData(temp)
   // }, [search])
+
+
+  // This Works Perfectly Fine
+  const openModal = () => {
+    setModalIsOpen(true);
+  };
+
+
+  // This Works Perfectly Fine
+  const closeModal = () => {
+    setModalIsOpen(false);
+  };
+
+
+  // This Works Perfectly Fine
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+
+  // This Works Perfectly Fine
+  const handleSubmit = () => {
+
+    if(isEdit){
+      let tempData = data.filter(single => single.id !== isEdit)
+      let newData = [...tempData, formData]
+      localStorage.setItem('userData', JSON.stringify(newData));
+      setData(newData);
+      setModalIsOpen(false);
+    }
+    else{
+      let newData =[...data, formData]
+      localStorage.setItem('userData', JSON.stringify(newData));
+      setData(newData);
+      setModalIsOpen(false);
+    }
+  };
+
+
+  // This Works Perfectly Fine
+  const handleCancel = () => {
+    setFormData({ name: '', phone: '', email: '', age: '' });
+    setModalIsOpen(false);
+  }
+
+
+  // Partially Working (⚠)
+  const handleEdit = (id) => {
+    const editData = data.filter(single => single.id === id);
+    console.log("editData ", editData);
+    setFormData(editData[0]);
+    setModalIsOpen(true);
+    setIsEdit(id)
+  };
+
+
+  // This Works Perfectly Fine
+  const handleDelete = (id) => {
+    const newData = data.filter(singleData => singleData.id !== id)
+    localStorage.setItem('userData', JSON.stringify(newData));
+    setData(newData);
+  };
+
+
+
+  // Sort the array of object by name 
+
+  // const sortByNameHandler = () => {
+  //   const tempData = data.sort(function (a, b) {
+  //     if (a.name < b.name) {
+  //       return -1;
+  //     }
+  //     if (a.name > b.name) {
+  //       return 1;
+  //     }
+  //     return 0;
+  //   });
+
+  //   setCategorizedData(tempData)
+  // }
+
+
+
+
+  const GridItem = ({ title, data }) => {
+    return (
+      <div style={styles.gridItem}>
+        <h2>{title}</h2>
+        <div>
+          {
+            data && data?.map((user, index) => {
+              return (
+                <div key={index} style={styles.card}>
+                  <p style={styles.label}>Name: {user.name}</p>
+                  <p>Phone: {user.phone}</p>
+                  <p>Email: {user.email}</p>
+                  <p>Age: {user.age}</p>
+                  <div style={{ marginTop: '10px' }}>
+                    <button
+                      onClick={() => handleDelete(user.id)}
+                      style={{ ...styles.cardButton, ...styles.deleteButton }}
+                    >
+                      Delete
+                    </button>
+                    <button onClick={() => handleEdit(user.id)} style={styles.cardButton}>
+                      Edit
+                    </button>
+                  </div>
+                </div>
+              )
+            })
+          }
+        </div>
+      </div>
+    );
+  };
+
+ 
+
+
+
 
   return (
     <div style={styles.container}>
@@ -262,7 +299,10 @@ const App = () => {
         Add User
       </button>
       <span className='ml-4'>
-        <label htmlFor='search'>🔍 <input placeholder='Search by Name' type='text' onChange={(e) => setSearch(e.target.value)} style={{border: '1px solid black', padding: '6px'}} /></label>
+        <label htmlFor='search'>🔍 <input placeholder='Search by Name (Partially Completed)' type='text' onChange={(e) => setSearch(e.target.value)} style={{border: '1px solid black', padding: '6px'}} /></label>
+      </span>
+      <span className='ml-4'>
+      <button type="button" class="text-white bg-purple-700 hover:bg-purple-800 focus:outline-none focus:ring-4 focus:ring-purple-300 font-medium rounded-full text-sm px-5 py-2.5 text-center mb-2 dark:bg-purple-600 dark:hover:bg-purple-700 dark:focus:ring-purple-900">Sort By Name</button>
       </span>
       
 
