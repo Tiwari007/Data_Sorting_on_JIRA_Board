@@ -115,7 +115,6 @@ const App = () => {
   });
   const [search, setSearch] = useState("")
 
-
   // whenever the application run it load the data from localstorage if it is there else it takes the initial data
   useEffect(() => {
     const storedData = JSON.parse(localStorage.getItem('userData')) || data;
@@ -157,14 +156,13 @@ const App = () => {
     setCategorizedData(newCategorizedData);
   }, [data]);
 
-    // Partially Working 
+  
   // When we type in search box it check the name that matches and store in the categorizedData.
   // That will show only that data we are looking for 
-
-  // useEffect(() => {
-  //   const temp = data.filter(single => single?.name?.toLowerCase().includes(search?.toLowerCase()))
-  //   setCategorizedData(temp)
-  // }, [search])
+  useEffect(() => {
+    const temp = data.filter(single => single?.name?.toLowerCase().includes(search?.toLowerCase()))
+    setData(temp)
+  }, [search])
 
 
   const openModal = () => {
@@ -186,7 +184,7 @@ const App = () => {
 
   // Tafter submitting it check if we are on edit mode or not and through the result accorning to edit mode.
   const handleSubmit = () => {
-    if(isEdit){
+    if (isEdit) {
       let tempData = data.filter(single => single.id !== isEdit)
       let newData = [...tempData, formData]
       localStorage.setItem('userData', JSON.stringify(newData));
@@ -195,8 +193,8 @@ const App = () => {
       setFormData({ name: '', phone: '', email: '', age: '' });
       setIsEdit(0);
     }
-    else{
-      let newData =[...data, formData]
+    else {
+      let newData = [...data, formData]
       localStorage.setItem('userData', JSON.stringify(newData));
       setData(newData);
       setModalIsOpen(false);
@@ -247,7 +245,7 @@ const App = () => {
 
 
 
-// Card for details
+  // Card for details
   const GridItem = ({ title, data }) => {
     return (
       <div style={styles.gridItem}>
@@ -289,12 +287,12 @@ const App = () => {
         Add User
       </button>
       <span className='ml-4'>
-        <label htmlFor='search'>🔍 <input placeholder='Search by Name (Partially Completed)' type='text' onChange={(e) => setSearch(e.target.value)} style={{border: '1px solid black', padding: '6px'}} /></label>
+        <label htmlFor='search'>🔍 <input placeholder='Search by Name (Partially Completed)' type='text' onChange={(e) => setSearch(e.target.value)} style={{ border: '1px solid black', padding: '6px' }} /></label>
       </span>
       <span className='ml-4'>
-      <button type="button" class="text-white bg-purple-700 hover:bg-purple-800 focus:outline-none focus:ring-4 focus:ring-purple-300 font-medium rounded-full text-sm px-5 py-2.5 text-center mb-2 dark:bg-purple-600 dark:hover:bg-purple-700 dark:focus:ring-purple-900">Sort By Name</button>
+        <button type="button" className="text-white bg-purple-700 hover:bg-purple-800 focus:outline-none focus:ring-4 focus:ring-purple-300 font-medium rounded-full text-sm px-5 py-2.5 text-center mb-2 dark:bg-purple-600 dark:hover:bg-purple-700 dark:focus:ring-purple-900">Sort By Name</button>
       </span>
-      
+
       {/* Modal for create and edit detail */}
       <Modal isOpen={modalIsOpen} onRequestClose={closeModal} style={styles.modal}>
         <div>
