@@ -91,13 +91,6 @@ const App = () => {
   const [data, setData] = useState([
     {
       id: Math.floor(Math.random() * 1000),
-      name: "Vivek",
-      email: "vt@mail.com",
-      phone: "98883",
-      age: 24
-    },
-    {
-      id: Math.floor(Math.random() * 1000),
       name: "Bucky",
       email: "buck@mail.com",
       phone: "988898",
@@ -112,7 +105,7 @@ const App = () => {
     }
   ]);
   const [modalIsOpen, setModalIsOpen] = useState(false);
-  const [formData, setFormData] = useState({ name: '', phone: '', email: '', age: '' });
+  const [formData, setFormData] = useState({ id: '', name: '', phone: '', email: '', age: '' });
   const [isEdit, setIsEdit] = useState(0);
   const [categorizedData, setCategorizedData] = useState({
     'Age 1-18': [],
@@ -122,15 +115,19 @@ const App = () => {
   });
   const [search, setSearch] = useState("")
 
+
+  // whenever the application run it load the data from localstorage if it is there else it takes the initial data
   useEffect(() => {
     const storedData = JSON.parse(localStorage.getItem('userData')) || data;
     setData(storedData);
   }, []);
 
+
+  // Whenver the data changes it run this effect and reorder the data according to age and save in particular grid.
   useEffect(() => {
     console.log("data", data);
 
-    // Create a copy of the current state to avoid mutating it directly
+    // Created a copy of the current state to avoid mutating it directly
     const newCategorizedData = {
       'Age 1-18': [],
       'Age 19-25': [],
@@ -158,7 +155,6 @@ const App = () => {
 
     // Update state with the new categorizedData
     setCategorizedData(newCategorizedData);
-
   }, [data]);
 
     // Partially Working 
@@ -171,51 +167,51 @@ const App = () => {
   // }, [search])
 
 
-  // This Works Perfectly Fine
   const openModal = () => {
     setModalIsOpen(true);
   };
 
-
-  // This Works Perfectly Fine
   const closeModal = () => {
     setModalIsOpen(false);
+    setFormData({ id: '', name: '', phone: '', email: '', age: '' });
+    setIsEdit(0);
   };
 
 
-  // This Works Perfectly Fine
+  // store the data as we chnge to write in form field.
   const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    setFormData({ ...formData, [e.target.name]: e.target.value, id: Math.floor(Math.random() * 1000) });
   };
 
 
-  // This Works Perfectly Fine
+  // Tafter submitting it check if we are on edit mode or not and through the result accorning to edit mode.
   const handleSubmit = () => {
-
     if(isEdit){
       let tempData = data.filter(single => single.id !== isEdit)
       let newData = [...tempData, formData]
       localStorage.setItem('userData', JSON.stringify(newData));
       setData(newData);
       setModalIsOpen(false);
+      setFormData({ name: '', phone: '', email: '', age: '' });
+      setIsEdit(0);
     }
     else{
       let newData =[...data, formData]
       localStorage.setItem('userData', JSON.stringify(newData));
       setData(newData);
       setModalIsOpen(false);
+      setFormData({ name: '', phone: '', email: '', age: '' });
     }
   };
 
-
-  // This Works Perfectly Fine
+  // Resetting the fiels to empty when we click on cancel.
   const handleCancel = () => {
     setFormData({ name: '', phone: '', email: '', age: '' });
     setModalIsOpen(false);
   }
 
 
-  // Partially Working (⚠)
+  // show the data in form which we clicked on edit
   const handleEdit = (id) => {
     const editData = data.filter(single => single.id === id);
     console.log("editData ", editData);
@@ -225,13 +221,12 @@ const App = () => {
   };
 
 
-  // This Works Perfectly Fine
+  // delete the data according to its correspond id
   const handleDelete = (id) => {
     const newData = data.filter(singleData => singleData.id !== id)
     localStorage.setItem('userData', JSON.stringify(newData));
     setData(newData);
   };
-
 
 
   // Sort the array of object by name 
@@ -252,7 +247,7 @@ const App = () => {
 
 
 
-
+// Card for details
   const GridItem = ({ title, data }) => {
     return (
       <div style={styles.gridItem}>
@@ -286,11 +281,6 @@ const App = () => {
     );
   };
 
- 
-
-
-
-
   return (
     <div style={styles.container}>
       <h1 style={styles.heading}>Age Grid Application</h1>
@@ -305,7 +295,7 @@ const App = () => {
       <button type="button" class="text-white bg-purple-700 hover:bg-purple-800 focus:outline-none focus:ring-4 focus:ring-purple-300 font-medium rounded-full text-sm px-5 py-2.5 text-center mb-2 dark:bg-purple-600 dark:hover:bg-purple-700 dark:focus:ring-purple-900">Sort By Name</button>
       </span>
       
-
+      {/* Modal for create and edit detail */}
       <Modal isOpen={modalIsOpen} onRequestClose={closeModal} style={styles.modal}>
         <div>
           <h2 style={{ ...styles.heading, marginBottom: '20px' }}>Add User</h2>
@@ -365,15 +355,8 @@ const App = () => {
       </Modal>
 
 
-
-      {/* Here we have to create a grid(table) of four coulmns */}
-
+      {/* As we four categorized index it create for 4 column acoording to the age */}
       <div style={styles.jiraGrid}>
-        {/* We have to map through the data and check the age for the data according t that
-        we have send the data in that grid.
-        
-        Note: - For that let's create a card what it looks like */}
-
         {
           Object.keys(categorizedData).map(ageGroup => (
             <GridItem key={ageGroup} title={`Grid ${ageGroup}`} data={categorizedData[ageGroup]} />
